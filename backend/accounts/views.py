@@ -6,8 +6,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
 class LoginAPIView(APIView):
-    permission_classes = []
-    
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
