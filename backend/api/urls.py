@@ -8,5 +8,5 @@ router = DefaultRouter()
 router.register(r'slider_images', ImageViewSet, basename='slider_image')
 
 urlpatterns = [
-    path('slider_images/', include(router.urls)),
+    path('', include(router.urls)),
 ]
