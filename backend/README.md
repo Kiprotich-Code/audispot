@@ -6,6 +6,7 @@ This is the current backend folder structure.
 ```
 accounts: Custom app to handle user authentication and permissions.
 backend: Default app which includes the standard Django settings.
+api: Currently handles slider images for upload on audispot site.
 ```
 ## Getting Started
 ### Pre-requisites
