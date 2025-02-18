@@ -9,7 +9,6 @@ from rest_framework import status
 class ImageViewSet(viewsets.ModelViewSet):
     queryset = SliderImage.objects.all()
     serializer_class = SliderImageSerializer
-    parser_classes = [MultiPartParser, FormParser]
     
     # CREATE A NEW IMAGE 
     def create(self, request, *args, **kwargs):
