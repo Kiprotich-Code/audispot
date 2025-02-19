@@ -1,171 +1,115 @@
 "use client";
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { StaticImageData } from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import audi1 from "../public/Assets/Kenya Audis/Audi1.jpg";
-import audi2 from "../public/Assets/Kenya Audis/Audi2.jpg";
-import audi3 from "../public/Assets/Kenya Audis/Audi3.jpg";
-import audi4 from "../public/Assets/Kenya Audis/Audi4.jpg";
-import audi5 from "../public/Assets/Kenya Audis/Audi5.jpg";
-import audi6 from "../public/Assets/Kenya Audis/Audi6.jpg";
-import audi7 from "../public/Assets/Kenya Audis/Audi7.jpg";
-import audi8 from "../public/Assets/Kenya Audis/Audi8.jpg";
-import audi9 from "../public/Assets/Kenya Audis/Audi9.jpg";
-import audi10 from "../public/Assets/Kenya Audis/Audi10.jpg";
-import audi11 from "../public/Assets/Kenya Audis/Audi11.jpg";
-import audi12 from "../public/Assets/Kenya Audis/Audi12.jpg";
-import audi13 from "../public/Assets/Kenya Audis/Audi13.jpg";
-import audi14 from "../public/Assets/Kenya Audis/Audi14.jpg";
-import audi15 from "../public/Assets/Kenya Audis/Audi15.jpg";
-import audi16 from "../public/Assets/Kenya Audis/Audi16.jpg";
-import audi17 from "../public/Assets/Kenya Audis/Audi17.jpg";
-import audi18 from "../public/Assets/Kenya Audis/Audi18.jpg";
 
-// Interface for image data
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+// Interface for image data from the API
 interface ImageData {
-  src: StaticImageData;
+  title: string;
+  image: string; // URL for the image
+  uploaded_at: string; // Date the image was uploaded
 }
 
-// Image data array
-const images: ImageData[] = [
-  {
-    src: audi1,
-  },
-  {
-    src: audi2,
-  },
-  {
-    src: audi3,
-  },
-  {
-    src: audi4,
-  },
-  {
-    src: audi5,
-  },
-  {
-    src: audi6,
-  },
-  {
-    src: audi7,
-  },
-  {
-    src: audi8,
-  },
-  {
-    src: audi9,
-  },
-  {
-    src: audi10,
-  },
-  {
-    src: audi11,
-  },
-  {
-    src: audi12,
-  },
-  {
-    src: audi13,
-  },
-  {
-    src: audi14,
-  },
-  {
-    src: audi15,
-  },
-  {
-    src: audi16,
-  },
-  {
-    src: audi17,
-  },
-];
-
 export default function ImageSlider(): JSX.Element {
-  // State to keep track of the current image index
+  // State to keep track of the image data
+  const [images, setImages] = useState<ImageData[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-
-  // State to determine if the image is being hovered over
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  // Function to show the previous slide
+  // Fetch images from the API using Axios
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/slider_images/");
+        setImages(response.data); // Assuming `response.data` is an array of objects with `title`, `image`, and `uploaded_at`
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+
+    fetchImages();
+  }, []);
+
   const prevSlide = (): void => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
-    );
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
 
-  // Function to show the next slide
   const nextSlide = (): void => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
 
-  // useEffect hook to handle automatic slide transition
   useEffect(() => {
-    // Start interval for automatic slide change if not hovered
-    if (!isHovered) {
+    if (!isHovered && images.length > 0) {
       const interval = setInterval(() => {
         nextSlide();
       }, 3000);
 
-      // Cleanup the interval on component unmount
-      return () => {
-        clearInterval(interval);
-      };
+      return () => clearInterval(interval);
     }
-  }, [isHovered]);
+  }, [isHovered, images]);
 
-  // Handle mouse over event
-  const handleMouseOver = (): void => {
-    setIsHovered(true);
-  };
+  const handleMouseOver = (): void => setIsHovered(true);
+  const handleMouseLeave = (): void => setIsHovered(false);
 
-  // Handle mouse leave event
-  const handleMouseLeave = (): void => {
-    setIsHovered(false);
-  };
+  if (images.length === 0) {
+    return <p>Loading...</p>; // Display a loading state until images are fetched
+  }
 
   return (
     <section className="md:max-w-4xl w-full py-8 mx-auto">
-      <div className="relative w-full px-4 md:px-1 mx-auto mt-4">
-        <div
-          className="relative h-[500px] w-full overflow-hidden group"
-          onMouseOver={handleMouseOver}
-          onMouseLeave={handleMouseLeave}
-        >
-          <Image
-            src={images[currentIndex].src}
-            alt={`Slider Image ${currentIndex + 1}`}
-            objectFit="cover"
-            className="w-full rounded-lg h-full object-cover transition-all duration-500 ease-in-out cursor-pointer"
-          />
-        </div>
-        <button
-          className="absolute left-12 top-1/2 transform h-[60px] rounded-xl hover:bg-[#1a222f] mx-1 -translate-y-1/2 bg-[#1a222f85] text-white p-2 group"
-          onClick={prevSlide}
-        >
-          <ChevronLeft className="text-gray-400 group-hover:text-white" />
-        </button>
-        <button
-          className="absolute right-12 top-1/2 transform h-[60px] rounded-xl hover:bg-[#1a222f] mx-1 -translate-y-1/2 bg-[#1a222f85] text-white p-2 group"
-          onClick={nextSlide}
-        >
-          <ChevronRight className="text-gray-400 group-hover:text-white" />
-        </button>
-        <div className="flex justify-center mt-4">
-          {images.map((_, index) => (
-            <div
-              key={index}
-              className={`h-1 w-10 mx-1 ${
-                index === currentIndex
+      {images.length > 0 ? (
+        <div className="relative w-full px-4 md:px-1 mx-auto mt-4">
+          <div
+            className="relative h-[500px] w-full overflow-hidden group"
+            onMouseOver={handleMouseOver}
+            onMouseLeave={handleMouseLeave}
+          >
+            <Image
+              src={images[currentIndex]?.image ? `http://127.0.0.1:8000${images[currentIndex].image}` : ""}
+              alt={images[currentIndex]?.title || "Image"}
+              width={800}
+              height={500}
+              objectFit="cover"
+              className="w-full rounded-lg h-full object-cover transition-all duration-500 ease-in-out cursor-pointer"
+            />
+            <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded-md">
+              <h2 className="text-lg font-bold">{images[currentIndex]?.title || "Untitled"}</h2>
+              <p className="text-sm">
+                {images[currentIndex]?.uploaded_at
+                  ? new Date(images[currentIndex].uploaded_at).toLocaleDateString()
+                  : "Unknown Date"}
+              </p>
+            </div>
+          </div>
+          <button
+            className="absolute left-12 top-1/2 transform h-[60px] rounded-xl hover:bg-[#1a222f] mx-1 -translate-y-1/2 bg-[#1a222f85] text-white p-2 group"
+            onClick={prevSlide}
+          >
+            <ChevronLeft className="text-gray-400 group-hover:text-white" />
+          </button>
+          <button
+            className="absolute right-12 top-1/2 transform h-[60px] rounded-xl hover:bg-[#1a222f] mx-1 -translate-y-1/2 bg-[#1a222f85] text-white p-2 group"
+            onClick={nextSlide}
+          >
+            <ChevronRight className="text-gray-400 group-hover:text-white" />
+          </button>
+          <div className="flex justify-center mt-4">
+            {images.map((_, index) => (
+              <div
+                key={index}
+                className={`h-1 w-10 mx-1 ${index === currentIndex
                   ? "bg-secondaryColor rounded-xl"
                   : "bg-gray-300 rounded-xl"
-              } transition-all duration-500 ease-in-out`}
-            ></div>
-          ))}
+                  } transition-all duration-500 ease-in-out`}
+              ></div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <p>Loading...</p>
+      )}
     </section>
   );
 }
